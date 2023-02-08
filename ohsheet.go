@@ -42,28 +42,56 @@ type Access struct {
 	// token for you.
 	Token string
 	// Credentials is the path to your credentials.json file. This file can
-	// be obtained from the API Keys section on Google Cloud Platform. You
+	// be obtained from the API Keys section of Google Cloud Platform. You
 	// may need to generate the file and enable the sheets API from within
-	// Googl Cloud Platform.
+	// Google Cloud Platform.
 	Credentials string
 	// Scopes define what level(s) of access we'll have to the spreadsheet
 	// If modifying these scopes, delete your previously saved token.json.
 	Scopes []string
 }
 
-// Connect is used to connect to the sheets API
-func (b *Access) Connect() *sheets.Service {
+// Connect is used to connect to the sheets API. The code for this was mostly
+// written by Google devs (see: connect.go). It will check for your
+// credentials.json file in the root directory.
+//
+// Obtaining credentials:
+//
+// You download the credentials.json file from Google Cloud console in the
+// "APIs and Credentials" section. You may need to generate the file.
+// This file is used along with your selected scopes to generate a config.
+//
+// Obtaining a token:
+//
+// NOTE: These instructions only apply when your credentials are generated
+// for a stand-alone desktop app. Other types of apps may need to obtain a
+// token by other means.
+//
+// If you don't have a token, this program will help you obtain one on the
+// first run. If you start getting errors you may need to delete the token and
+// restart the program to generate a new one. On the first run, start the
+// program in a terminal, and you'll receive a link to open in your browser to
+// allow the program access to your account. Once you allow access you'll
+// arrive at a dead link that looks like this:
+//
+// http://localhost/?state=state-token&code=LONG_CODE_HERE_COPY_THIS&scope=https://www.googleapis.com/auth/spreadsheets
+//
+// Copy the code found between `code=` and `&scope`, and then come back to the
+// terminal, paste it in, and press enter. This will download a fresh token,
+// and your program will proceed as normal. You'll only need to do this on the
+// first run and when your token expires.
+func (a *Access) Connect() *sheets.Service {
 	ctx := context.Background()
-	cred, err := os.ReadFile(b.Credentials)
+	cred, err := os.ReadFile(a.Credentials)
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
 	}
 
-	config, err := google.ConfigFromJSON(cred, b.Scopes...)
+	config, err := google.ConfigFromJSON(cred, a.Scopes...)
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
-	client := getClient(config, b.Token)
+	client := getClient(config, a.Token)
 
 	srv, err := sheets.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
@@ -73,7 +101,7 @@ func (b *Access) Connect() *sheets.Service {
 }
 
 // Write is used to write to a spreadsheet
-func (b *Access) Write(srv *sheets.Service, spreadsheetId string, writeRange string, vals []interface{}) (*sheets.UpdateValuesResponse, error) {
+func (a *Access) Write(srv *sheets.Service, spreadsheetId string, writeRange string, vals []interface{}) (*sheets.UpdateValuesResponse, error) {
 	var vr sheets.ValueRange
 	vr.Values = append(vr.Values, vals)
 
@@ -81,6 +109,6 @@ func (b *Access) Write(srv *sheets.Service, spreadsheetId string, writeRange str
 }
 
 // Read is used to read from a spreadsheet
-func (b *Access) Read(srv *sheets.Service, spreadsheetId string, readRange string) (*sheets.ValueRange, error) {
+func (a *Access) Read(srv *sheets.Service, spreadsheetId string, readRange string) (*sheets.ValueRange, error) {
 	return srv.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
 }

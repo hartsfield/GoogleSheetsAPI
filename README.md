@@ -43,10 +43,15 @@ https://developers.google.com/sheets/api/quickstart/go
 That link will walk you through enabling the sheets API through the Google 
 Cloud console, and creating and downloading your `credentials.json` file.
 
-Once you have enabled the API and downloaded the `credentials.json` file, you 
-can connect to the API in a Go program using the following code:
+Once you have enabled the API, downloaded the `credentials.json` file and 
+placed it in the root directory of your program, you can connect to the API in 
+a Go program using the following code:
 
 ```
+package main
+
+import "github.com/hartsfield/ohsheet"
+
 func main() {                                                                          
         // Connect to the API                                                          
         sheet := &ohsheet.Access{                                                      
@@ -62,6 +67,15 @@ func main() {
 
 ```
 func main() {                                                                          
+        package main
+
+        import (
+                "fmt"
+                "log"
+
+                "github.com/hartsfield/ohsheet"
+        )
+
         // Connect to the API                                                          
         sheet := &ohsheet.Access{                                                      
                 Token:       "token.json",                                             
@@ -79,7 +93,7 @@ func main() {
         
         resp, err := sheet.Read(srv, spreadsheetId, readRange)
         if err != nil {
-                log.Fatalf("Unable to retrieve data from sheet: %v", err)
+                fmt.Fatalf("Unable to retrieve data from sheet: %v", err)
         }
 
         if len(resp.Values) == 0 {
@@ -97,6 +111,15 @@ func main() {
 ### Writing values to a spreadsheet:
 
 ```
+package main
+
+import (
+        "fmt"
+        "log"
+
+        "github.com/hartsfield/ohsheet"
+)
+
 func main() {                                                                          
         // Connect to the API                                                          
         sheet := &ohsheet.Access{                                                      
@@ -107,6 +130,7 @@ func main() {
         srv := sheet.Connect()                                                         
 
         spreadsheetId := "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+
         // Write to the sheet
         writeRange := "K2"
         data := []interface{}{"test data 3"}
@@ -114,6 +138,6 @@ func main() {
         if err != nil {
                 log.Fatalf("Unable to retrieve data from sheet: %v", err)
         }
-        log.Println(res)
+        fmt.Println(res)
 }
 ```
