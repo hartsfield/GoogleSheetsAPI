@@ -21,12 +21,12 @@
 <!-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE -->
 <!-- SOFTWARE. -->
 
-#OhSheet!
+# OhSheet!
 
 `ohsheet` is a very tiny Go module used for accessing the Google Sheets API, 
 and reading and writing to spreadsheets.
 
-#Example Usage
+# Example Usage
 
 ### Validating credentials and connecting to the API:
 
