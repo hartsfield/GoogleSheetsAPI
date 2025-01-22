@@ -21,9 +21,10 @@
 <!-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE -->
 <!-- SOFTWARE. -->
 ![gopher](https://github.com/hartsfield/ohsheet/blob/master/gophersheet.png?raw=true)
-# OhSheet!
 
-`ohsheet` is a very tiny Go module used for accessing the Google Sheets API, 
+# OhSheet - Access Google Sheets API via Go
+
+`ohsheet` is a Go module used for accessing the Google Sheets API, 
 and reading and writing to spreadsheets.
 
 # Example Usage
