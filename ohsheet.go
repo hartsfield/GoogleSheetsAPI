@@ -101,11 +101,11 @@ func (a *Access) Connect() *sheets.Service {
 }
 
 // Write is used to write to a spreadsheet
-func (a *Access) Write(srv *sheets.Service, spreadsheetId string, writeRange string, vals []interface{}) (*sheets.UpdateValuesResponse, error) {
+func (a *Access) Write(srv *sheets.Service, spreadsheetId string, writeRange string, vals []interface{}) (*sheets.AppendValuesResponse, error) {
 	var vr sheets.ValueRange
 	vr.Values = append(vr.Values, vals)
 
-	return srv.Spreadsheets.Values.Update(spreadsheetId, writeRange, &vr).ValueInputOption("RAW").Do()
+	return srv.Spreadsheets.Values.Append(spreadsheetId, writeRange, &vr).ValueInputOption("RAW").Do()
 }
 
 // Read is used to read from a spreadsheet
