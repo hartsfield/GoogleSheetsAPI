@@ -24,17 +24,14 @@ package ohsheet
 
 import (
 	"context"
-	"log"
-	"os"
 
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
 
 // Access contains values used for accessing the sheets API server, including
 // access token, API credentials, and scopes
 type Access struct {
+	Context context.Context
 	// Token is the path to your token.json file. If you're having trouble
 	// authenticating, try deleting this file and running the program
 	// again. This should renew your token. If you've never run this
@@ -80,32 +77,38 @@ type Access struct {
 // terminal, paste it in, and press enter. This will download a fresh token,
 // and your program will proceed as normal. You'll only need to do this on the
 // first run and when your token expires.
-func (a *Access) Connect() *sheets.Service {
-	ctx := context.Background()
-	cred, err := os.ReadFile(a.Credentials)
-	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
-	}
+// func (a *Access) Connect() *sheets.Service {
+// 	a.Context = context.Background()
+// 	cred, err := os.ReadFile(a.Credentials)
+// 	if err != nil {
+// 		log.Fatalf("Unable to read client secret file: %v", err)
+// 	}
 
-	config, err := google.ConfigFromJSON(cred, a.Scopes...)
-	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
-	}
-	client := getClient(config, a.Token)
+// 	config, err := google.ConfigFromJSON(cred, a.Scopes...)
+// 	if err != nil {
+// 		log.Fatalf("Unable to parse client secret file to config: %v", err)
+// 	}
+// 	client := getClient(config, a.Token)
+// 	srv, err := sheets.NewService(a.Context, option.WithHTTPClient(client))
+// 	if err != nil {
+// 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
+// 	}
+// 	return srv
+// }
 
-	srv, err := sheets.NewService(ctx, option.WithHTTPClient(client))
-	if err != nil {
-		log.Fatalf("Unable to retrieve Sheets client: %v", err)
-	}
-	return srv
+type Spread struct {
+	WriteRange       string
+	ID               string
+	Vals             []interface{}
+	ValueInputOption string
 }
 
 // Write is used to write to a spreadsheet
-func (a *Access) Write(srv *sheets.Service, spreadsheetId string, writeRange string, vals []interface{}) (*sheets.AppendValuesResponse, error) {
+func (a *Spread) Write(srv *sheets.Service) (*sheets.AppendValuesResponse, error) {
 	var vr sheets.ValueRange
-	vr.Values = append(vr.Values, vals)
+	vr.Values = append(vr.Values, a.Vals)
 
-	return srv.Spreadsheets.Values.Append(spreadsheetId, writeRange, &vr).ValueInputOption("RAW").Do()
+	return srv.Spreadsheets.Values.Append(a.ID, a.WriteRange, &vr).ValueInputOption(a.ValueInputOption).Do()
 }
 
 // Read is used to read from a spreadsheet
