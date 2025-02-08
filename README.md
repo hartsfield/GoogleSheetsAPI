@@ -20,7 +20,7 @@
 <!-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, -->
 <!-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE -->
 <!-- SOFTWARE. -->
-![gopher](https://github.com/hartsfield/ohsheet/blob/master/gophersheet.png?raw=true)
+# DEPRECATED See: (gsheet)[https://github.com/sigma-firma/gsheet] for the same functionality but for human `beiungs"
 
 # OhSheet - Access Google Sheets API via Go
 

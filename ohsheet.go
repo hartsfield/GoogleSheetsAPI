@@ -24,7 +24,11 @@ package ohsheet
 
 import (
 	"context"
+	"log"
+	"os"
 
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -77,38 +81,31 @@ type Access struct {
 // terminal, paste it in, and press enter. This will download a fresh token,
 // and your program will proceed as normal. You'll only need to do this on the
 // first run and when your token expires.
-// func (a *Access) Connect() *sheets.Service {
-// 	a.Context = context.Background()
-// 	cred, err := os.ReadFile(a.Credentials)
-// 	if err != nil {
-// 		log.Fatalf("Unable to read client secret file: %v", err)
-// 	}
+func (a *Access) Connect() *sheets.Service {
+	a.Context = context.Background()
+	cred, err := os.ReadFile(a.Credentials)
+	if err != nil {
+		log.Fatalf("Unable to read client secret file: %v", err)
+	}
 
-// 	config, err := google.ConfigFromJSON(cred, a.Scopes...)
-// 	if err != nil {
-// 		log.Fatalf("Unable to parse client secret file to config: %v", err)
-// 	}
-// 	client := getClient(config, a.Token)
-// 	srv, err := sheets.NewService(a.Context, option.WithHTTPClient(client))
-// 	if err != nil {
-// 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
-// 	}
-// 	return srv
-// }
-
-type Spread struct {
-	WriteRange       string
-	ID               string
-	Vals             []interface{}
-	ValueInputOption string
+	config, err := google.ConfigFromJSON(cred, a.Scopes...)
+	if err != nil {
+		log.Fatalf("Unable to parse client secret file to config: %v", err)
+	}
+	client := getClient(config, a.Token)
+	srv, err := sheets.NewService(a.ctx, option.WithHTTPClient(client))
+	if err != nil {
+		log.Fatalf("Unable to retrieve Sheets client: %v", err)
+	}
+	return srv
 }
 
 // Write is used to write to a spreadsheet
-func (a *Spread) Write(srv *sheets.Service) (*sheets.AppendValuesResponse, error) {
+func (a *Access) Write(srv *sheets.Service, spreadsheetId string, writeRange string, vals []interface{}) (*sheets.AppendValuesResponse, error) {
 	var vr sheets.ValueRange
-	vr.Values = append(vr.Values, a.Vals)
+	vr.Values = append(vr.Values, vals)
 
-	return srv.Spreadsheets.Values.Append(a.ID, a.WriteRange, &vr).ValueInputOption(a.ValueInputOption).Do()
+	return srv.Spreadsheets.Values.Append(spreadsheetId, writeRange, &vr).ValueInputOption("RAW").Do()
 }
 
 // Read is used to read from a spreadsheet
